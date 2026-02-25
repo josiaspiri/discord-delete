@@ -1,0 +1,16 @@
+{
+  "accept": "*/*",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "priority": "u=1, i",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-site": "same-origin",
+  "x-debug-options": "bugReporterEnabled,isStreamInfoOverlayEnabled",
+  "accept-language": "",
+  "user-agent": "",
+  "sec-ch-ua": "",
+  "sec-ch-ua-mobile": "",
+  "sec-ch-ua-platform": "",
+  "x-installation-id": "",
+  "x-super-properties": ""
+}
