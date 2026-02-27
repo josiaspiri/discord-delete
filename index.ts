@@ -34,7 +34,10 @@ for await (const line of console) {
 
 console.clear();
 
-const { AUTHORIZATION: authorization, COOKIE: cookie } = process.env;
+const {
+  DISCORD_DELETE_AUTHORIZATION: authorization,
+  DISCORD_DELETE_COOKIE: cookie,
+} = process.env;
 
 if (!authorization) {
   throw new Error("Missing authorization token.");
@@ -44,7 +47,6 @@ const headers = {
   ...UserHeaders,
   ...{ authorization, cookie },
 } as Record<string, string>;
-
 
 const baseURL = "https://discord.com/api/";
 const client = new APIClient(baseURL, headers);

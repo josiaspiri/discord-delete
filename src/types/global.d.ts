@@ -1,6 +1,6 @@
 declare namespace NodeJS {
   interface ProcessEnv {
-    AUTHORIZATION: string;
-    COOKIE: string;
+    DISCORD_DELETE_AUTHORIZATION: string;
+    DISCORD_DELETE_COOKIE: string;
   }
 }
