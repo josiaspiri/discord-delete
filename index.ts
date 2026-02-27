@@ -18,17 +18,6 @@ type Page = {
   reactionsRemoved: number;
 };
 
-const { AUTHORIZATION: authorization, COOKIE: cookie } = process.env;
-
-if (!authorization) {
-  throw new Error("Missing authorization token.");
-}
-
-const headers = {
-  ...UserHeaders,
-  ...{ authorization, cookie },
-} as Record<string, string>;
-
 const prompt = `===
 Running this is against Discord ToS and may result in account termination, unwanted data loss, and possibly more!
 By agreeing to this prompt, you acknowledge that you are solely responsible for the outcomes of executing this program.
@@ -44,6 +33,18 @@ for await (const line of console) {
 }
 
 console.clear();
+
+const { AUTHORIZATION: authorization, COOKIE: cookie } = process.env;
+
+if (!authorization) {
+  throw new Error("Missing authorization token.");
+}
+
+const headers = {
+  ...UserHeaders,
+  ...{ authorization, cookie },
+} as Record<string, string>;
+
 
 const baseURL = "https://discord.com/api/";
 const client = new APIClient(baseURL, headers);
