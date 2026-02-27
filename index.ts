@@ -1,8 +1,13 @@
+import dotenv from "dotenv";
 import APIClient from "@api/APIClient";
 import UserHeaders from "./userHeaders.json";
 import { MessageType } from "@types";
 import { sleep } from "bun";
 import logUpdate from "log-update";
+import { join } from "path";
+import { CWD } from "utility";
+
+dotenv.config({ path: join(CWD, ".env") });
 
 type State = {
   channels: string[];
