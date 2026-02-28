@@ -1,8 +1,13 @@
+import dotenv from "dotenv";
 import APIClient from "@api/APIClient";
 import UserHeaders from "./userHeaders.json";
 import { MessageType } from "@types";
 import { sleep } from "bun";
 import logUpdate from "log-update";
+import { join } from "path";
+import { CWD } from "utility";
+
+dotenv.config({ path: join(CWD, ".env") });
 
 type State = {
   channels: string[];
@@ -82,7 +87,7 @@ const populateChannels = async (): Promise<void> => {
 };
 
 const loadChannelsFromIndex = async (): Promise<string[]> => {
-  const file = Bun.file("./index.json");
+  const file = Bun.file(join(CWD, "index.json"));
   if (!(await file.exists())) return [];
   try {
     const obj = await file.json() as Record<string, unknown>;
@@ -96,7 +101,7 @@ const loadChannelsFromIndex = async (): Promise<string[]> => {
 
 const loadState = async (): Promise<Partial<State> | null> => {
   try {
-    const file = Bun.file("state.json");
+    const file = Bun.file(join(CWD, "state.json"));
     if (!(await file.exists())) return null;
     const text = await file.text();
     return JSON.parse(text) as Partial<State>;
@@ -107,7 +112,7 @@ const loadState = async (): Promise<Partial<State> | null> => {
 
 const saveState = async (state: State): Promise<void> => {
   const json = JSON.stringify(state, null, 2);
-  await Bun.write("state.json", json);
+  await Bun.write(join(CWD, "state.json"), json);
 };
 
 const getPage = async (
