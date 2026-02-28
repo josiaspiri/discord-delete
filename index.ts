@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import APIClient from "@api/APIClient";
-import UserHeaders from "./userHeaders.json";
 import { MessageType } from "@types";
 import { sleep } from "bun";
 import logUpdate from "log-update";
@@ -48,8 +47,11 @@ if (!authorization) {
   throw new Error("Missing authorization token.");
 }
 
+const userHeadersFile = Bun.file(join(CWD, "userHeaders.json"));
+const userHeaders = await userHeadersFile.exists() ? userHeadersFile.json() : {}
+
 const headers = {
-  ...UserHeaders,
+  ...userHeaders,
   ...{ authorization, cookie },
 } as Record<string, string>;
 
