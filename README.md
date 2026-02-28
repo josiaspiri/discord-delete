@@ -43,8 +43,8 @@ modified to match your client/browser.
 ### Data Export
 
 If you've requested your data export and downloaded it, simply drop index.json
-from ./package/Messages/index.json into this project's root directory or next to the executable and the
-channels within will be added to the list.
+from ./package/Messages/index.json into this project's root directory or next to
+the executable and the channels within will be added to the list.
 
 ## Usage
 
@@ -80,9 +80,10 @@ outcomes of using this program.
 
 ### From Download
 
-Download the executable for your OS and architecture from [releases](https://github.com/josiaspiri/discord-delete/releases). At minimum, create a
-.env file next to it including your auth token. Run the file and the process
-will begin.
+Download the executable for your OS and architecture from
+[releases](https://github.com/josiaspiri/discord-delete/releases). At minimum,
+create a .env file next to it including your auth token. Run the file and the
+process will begin.
 
 You will be presented with a dialogue to accept sole responsibility for any
 outcomes of using this program.

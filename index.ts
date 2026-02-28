@@ -48,7 +48,9 @@ if (!authorization) {
 }
 
 const userHeadersFile = Bun.file(join(CWD, "userHeaders.json"));
-const userHeaders = await userHeadersFile.exists() ? userHeadersFile.json() : {}
+const userHeaders = await userHeadersFile.exists()
+  ? userHeadersFile.json()
+  : {};
 
 const headers = {
   ...userHeaders,
