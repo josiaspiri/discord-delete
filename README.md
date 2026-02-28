@@ -53,8 +53,8 @@ request header from an HTTP request (@me from /api/v9/quests/@me, for example).
 
 ### Headers
 
-See defaultHeaders.json and userHeaders.example.json. These are used for every
-request and may be modified to match your client/browser.
+See userHeaders.example.json. These are used for every request and may be
+modified to match your client/browser.
 
 ### Data Export
 
@@ -63,6 +63,12 @@ from ./package/Messages/index.json into this project's root directory and the
 channels within will be added to the list.
 
 ## Usage
+
+**Note:** This operation may take a long time to complete depending on your
+account age and usage. Fret not, the program may be stopped and resumed without
+losing progress. See state.json to get an idea of how things are coming along.
+
+### From Source
 
 After completing the steps in the "Setup" section, open a terminal/powershell in
 the root directory and run:
@@ -74,9 +80,14 @@ bun i && bun index.ts
 You will be presented with a dialogue to accept sole responsibility for any
 outcomes of using this program.
 
-**Note:** This may take a long time to complete depending on your account age
-and usage. Fret not, the program may be stopped and resumed without losing
-progress. See state.json to get an idea of how things are coming along.
+### From Download
+
+Download the executable for your OS and architecture from [releases](https://github.com/josiaspiri/discord-delete/releases). At minimum, create a
+.env file next to it including your auth token. Run the file and the process
+will begin.
+
+You will be presented with a dialogue to accept sole responsibility for any
+outcomes of using this program.
 
 ## Musings
 
