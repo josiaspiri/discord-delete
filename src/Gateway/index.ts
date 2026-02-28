@@ -38,7 +38,7 @@ socket.onopen = () => {
   socket.send(JSON.stringify({
     "op": 2,
     "d": {
-      "token": process.env.AUTHORIZATION,
+      "token": process.env.DISCORD_DELETE_AUTHORIZATION,
       "capabilities": 0,
       "properties": {
         "os": "",
