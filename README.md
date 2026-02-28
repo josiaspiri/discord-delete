@@ -20,22 +20,6 @@ for
 
 _Messages and reactions in inaccessible channels will remain._
 
-## Requirements
-
-Install [Bun](https://bun.com/), a JS runtime.
-
-Linux/MacOS:
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
-Windows:
-
-```bash
-powershell -c "irm bun.sh/install.ps1 | iex"
-```
-
 ## Setup
 
 ### Auth Token (mandatory)
@@ -59,7 +43,7 @@ modified to match your client/browser.
 ### Data Export
 
 If you've requested your data export and downloaded it, simply drop index.json
-from ./package/Messages/index.json into this project's root directory and the
+from ./package/Messages/index.json into this project's root directory or next to the executable and the
 channels within will be added to the list.
 
 ## Usage
@@ -69,6 +53,20 @@ account age and usage. Fret not, the program may be stopped and resumed without
 losing progress. See state.json to get an idea of how things are coming along.
 
 ### From Source
+
+Install [Bun](https://bun.com/), a JS runtime.
+
+Linux/MacOS:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+Windows:
+
+```bash
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
 
 After completing the steps in the "Setup" section, open a terminal/powershell in
 the root directory and run:
