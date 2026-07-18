@@ -4,7 +4,7 @@ import { MessageType } from "@types";
 import { sleep } from "bun";
 import logUpdate from "log-update";
 import { join } from "path";
-import { CWD } from "utility";
+import { CWD } from "./utility";
 
 dotenv.config({ path: join(CWD, ".env") });
 
