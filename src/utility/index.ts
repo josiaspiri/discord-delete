@@ -1,11 +1,7 @@
 import path from "path";
 
-const getCWD = (isExecutable: boolean) => {
-  if (isExecutable) {
-    return path.dirname(process.execPath);
-  }
-  return process.cwd();
-};
+const IS_EXECUTABLE = process.argv0 !== "bun";
 
-export const IS_EXECUTABLE = process.argv0 !== "bun";
-export const CWD = getCWD(IS_EXECUTABLE);
+export const CWD = IS_EXECUTABLE
+  ? path.dirname(process.execPath)
+  : process.cwd();
