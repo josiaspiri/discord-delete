@@ -4,3 +4,4 @@ node_modules
 state.json
 userHeaders.json
 index.json
+scratch.ts
