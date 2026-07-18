@@ -1,5 +1,5 @@
-import type { Reactions } from "../Reactions";
-import type { User } from "../Users";
+import type { Reactions } from "./reactions";
+import type { User } from "./users";
 
 export enum MessageType {
   DEFAULT = 0,
