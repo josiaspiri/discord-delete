@@ -1,4 +1,4 @@
-import type { User } from "types/Users";
+import type { User } from "@types";
 
 export interface Guild {
   id: string;

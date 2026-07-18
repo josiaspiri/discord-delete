@@ -7,7 +7,7 @@ import type {
   Message,
   Messages,
   MessageSearch,
-} from "../types";
+} from "@types";
 
 export default class APIClient extends HTTPClient {
   me = {

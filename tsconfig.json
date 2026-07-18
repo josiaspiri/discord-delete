@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "paths": {
-      "@api/*": ["api/*"],
-      "@types": ["types/"]
+      "@api/*": ["./src/api/*"],
+      "@types": ["./src/types/index.ts"]
     },
 
     // Environment setup & latest features
