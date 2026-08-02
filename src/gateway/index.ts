@@ -1,18 +1,27 @@
 import { constants, createInflate } from "zlib";
+import { gatewayEmitter } from "./emitter";
+import { GatewayEvent, GatewayOpCode } from "../types/gateway";
+
+export const emitter = gatewayEmitter;
 
 const socket = new WebSocket(
   "wss://gateway.discord.gg/?encoding=json&v=9&compress=zlib-stream",
 );
 
+const now = () => ~~performance.now();
+
 socket.onopen = () => {
   const inflater = createInflate();
+  const flush = Buffer.from([0x00, 0x00, 0xff, 0xff]);
+  let startupMs = 0;
+  let heartbeatIntervalMs = 0;
+  let heartbeatInterval: Timer | null = null;
   let buffer = Buffer.alloc(0);
-  let heartbeatTimer: Timer | null = null;
   let sequence: number | null = null;
 
   const sendHeartbeat = (sequence: number | null): void => {
     socket.send(JSON.stringify({
-      op: 40,
+      op: GatewayOpCode.QOS_HEARTBEAT,
       d: {
         seq: sequence,
         qos: { "active": false, "ver": 29, "reasons": [] },
@@ -25,22 +34,41 @@ socket.onopen = () => {
 
     try {
       const payload = JSON.parse(rawData);
-
-      if (payload.op === 0 && payload.s !== null) {
+      console.log(payload);
+      if (payload.s && payload.op === GatewayOpCode.DISPATCH) {
         sequence = payload.s;
       }
 
-      if (payload.op === 10 || payload.op === 11) {
-        if (heartbeatTimer) clearTimeout(heartbeatTimer);
-        const interval = payload.d.heartbeat_interval;
-        heartbeatTimer = setTimeout(() => sendHeartbeat(sequence), interval);
+      if (
+        payload.op === GatewayOpCode.HELLO
+      ) {
+        startupMs = now();
+        heartbeatIntervalMs = payload.d.heartbeat_interval;
+
+        if (!heartbeatIntervalMs || heartbeatIntervalMs === 0) {
+          throw Error("Invalid hearbeat interval. Did the API change?");
+        }
+        sendHeartbeat(sequence)
       }
 
-      if (payload.op === 1) {
+      if (payload.op === GatewayOpCode.HEARTBEAT_ACK) {
+        heartbeatInterval && clearTimeout(heartbeatInterval);
+        heartbeatInterval = setTimeout(() => {
+          sendHeartbeat(sequence);
+        }, heartbeatIntervalMs);
+      }
+
+      if (payload.op === GatewayOpCode.HEARTBEAT) {
         sendHeartbeat(sequence);
       }
 
-      console.log(payload);
+      if (payload.t === GatewayEvent.addReaction) {
+        gatewayEmitter.emit("gateway:addReaction", payload);
+      }
+
+      if (payload.t === GatewayEvent.addMessage) {
+        gatewayEmitter.emit("gateway:addMessage", payload);
+      }
     } catch (e) {}
   });
 
@@ -48,7 +76,6 @@ socket.onopen = () => {
     const { data } = event;
     buffer = Buffer.concat([buffer, data]);
 
-    const flush = Buffer.from([0x00, 0x00, 0xff, 0xff]);
     if (!buffer.subarray(-4).equals(flush)) return;
 
     inflater.write(buffer);
@@ -58,14 +85,13 @@ socket.onopen = () => {
   };
 
   socket.send(JSON.stringify({
-      "op": 2,
-      "d": {
-        "token": process.env.DISCORD_DELETE_AUTHORIZATION,
-        "properties": {},
-        "client_state": {
-          "guild_versions": {},
-        },
+    "op": GatewayOpCode.IDENTIFY,
+    "d": {
+      "token": process.env.DISCORD_DELETE_AUTHORIZATION,
+      "properties": {},
+      "client_state": {
+        "guild_versions": {},
       },
     },
-  ));
+  }));
 };
