@@ -12,6 +12,7 @@ export interface Message {
   content: string;
   id: string;
   channel_id: string;
+  timestamp: string;
   author: User;
   reactions?: Reactions;
 }
