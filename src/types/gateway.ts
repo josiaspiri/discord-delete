@@ -52,14 +52,17 @@ export type GatewayMessageCreate = GatewayEventData<
   Message
 >;
 
+export interface ReactionAddPayload {
+  user_id: string;
+  message_id: string;
+  message_author_id: string;
+  channel_id: string;
+  emoji: Emoji;
+}
+
 export type GatewayReactionAdd = GatewayEventData<
   GatewayEvent.addReaction,
-  {
-    message_id: string;
-    message_author_id: string;
-    channel_id: string;
-    emoji: Emoji;
-  }
+  ReactionAddPayload
 >;
 
 export interface GatewayEmitterEvents {
