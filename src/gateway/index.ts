@@ -68,8 +68,8 @@ const connect = () => {
           gatewayEmitter.emit("gateway:addReaction", payload);
         }
 
-        if (payload.t === GatewayEvent.addMessage) {
-          gatewayEmitter.emit("gateway:addMessage", payload);
+        if (payload.t === GatewayEvent.createMessage) {
+          gatewayEmitter.emit("gateway:createMessage", payload);
         }
       } catch (e) {}
     });

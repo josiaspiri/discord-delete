@@ -2,7 +2,7 @@ import type { Message } from "@types";
 import type { Emoji } from "@types";
 
 export enum GatewayEvent {
-  addMessage = "MESSAGE_CREATE",
+  createMessage = "MESSAGE_CREATE",
   addReaction = "MESSAGE_REACTION_ADD",
 }
 
@@ -48,7 +48,7 @@ export interface GatewayEventData<T extends GatewayEvent, D> {
 }
 
 export type GatewayMessageCreate = GatewayEventData<
-  GatewayEvent.addMessage,
+  GatewayEvent.createMessage,
   Message
 >;
 
