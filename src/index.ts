@@ -63,10 +63,10 @@ const client = new APIClient(baseURL, headers);
 const allChannels: string[] = [];
 
 const populateChannels = async (): Promise<void> => {
-  const guilds = await client.guilds.list();
+  const { data: guilds } = await client.guilds.list();
   if (!guilds) throw new Error("No guilds, or something broke.");
 
-  const flatChannels = await client.channels.list();
+  const { data: flatChannels } = await client.channels.list();
   if (!flatChannels) throw new Error("No channels, or something broke.");
 
   const channelIdSet = new Set<string>();
@@ -76,7 +76,7 @@ const populateChannels = async (): Promise<void> => {
   }
 
   for (const guild of guilds) {
-    const guildChannels = await client.channels.fromGuild(guild.id);
+    const { data: guildChannels } = await client.channels.fromGuild(guild.id);
     console.log(
       `Got ${guildChannels?.length ?? 0} channels from ${guild.name}.`,
     );
@@ -127,7 +127,11 @@ const getPage = async (
 ): Promise<Page> => {
   const PAGE_SIZE = defaults.pageSize;
 
-  const messages = await client.messages.list(channel.id, lastId, PAGE_SIZE);
+  const { data: messages } = await client.messages.list(
+    channel.id,
+    lastId,
+    PAGE_SIZE,
+  );
   if (!messages || messages.length === 0) {
     return {
       nextLastId: lastId,
@@ -220,7 +224,7 @@ const getPage = async (
 
   console.clear();
 
-  const me = await client.me.get();
+  const { data: me } = await client.me.get();
   if (!me) {
     throw new Error(
       "Authentication failed. Invalid token or Discord is down.",
@@ -234,7 +238,7 @@ const getPage = async (
       continue;
     }
 
-    const channel = await client.channels.byId(channelId);
+    const { data: channel } = await client.channels.byId(channelId);
     if (!channel) {
       state.currentIndex++;
       state.lastMessageId = undefined;

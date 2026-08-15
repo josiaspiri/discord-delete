@@ -10,6 +10,12 @@ interface APIError {
   retry_after?: number;
 }
 
+export interface APIResult<T> {
+  ok: boolean;
+  status: number | null;
+  data: T | null;
+}
+
 export default abstract class HTTPClientBase {
   private readonly maxAttempts: number;
 
@@ -41,12 +47,12 @@ export default abstract class HTTPClientBase {
     return this.request<T>("DELETE", path, headers);
   }
 
-  protected async request<T>(
+  private async sendWithRetry(
     method: Methods,
     path: string,
     headers?: Headers,
     body?: BodyInit,
-  ): Promise<T | null> {
+  ): Promise<Response | null> {
     const url = new URL(path, this.baseURL);
     const mergedHeaders = { ...this.headers, ...headers };
 
@@ -66,13 +72,7 @@ export default abstract class HTTPClientBase {
         return null;
       }
 
-      if (response.ok) {
-        try {
-          return (await response.json()) as T;
-        } catch (_) {
-          return null;
-        }
-      }
+      if (response.ok) return response;
 
       if (response.status === 504) {
         await sleep(5000);
@@ -91,9 +91,26 @@ export default abstract class HTTPClientBase {
         continue;
       }
 
-      return null;
+      return response;
     }
 
     return null;
+  }
+
+  protected async request<T>(
+    method: Methods,
+    path: string,
+    headers?: Headers,
+    body?: BodyInit,
+  ): Promise<APIResult<T>> {
+    const response = await this.sendWithRetry(method, path, headers, body);
+    if (!response) return { ok: false, status: null, data: null };
+
+    let data: T | null = null;
+    try {
+      data = (await response.json()) as T;
+    } catch (_) {}
+
+    return { ok: response.ok, status: response.status, data };
   }
 }

@@ -107,7 +107,7 @@ const catchUpChannel = async (
   let after = lastDiscordMessageId;
 
   for (;;) {
-    const page = await client.messages.list(
+    const { data: page } = await client.messages.list(
       discordChannelId,
       undefined,
       BACKFILL_PAGE_SIZE,
@@ -178,10 +178,12 @@ const sweepExpiredMessages = () => {
     );
 
     enqueueDeletion(pendingDeleteMessageKeys, key, async () => {
-      await client.messages.delete(
+      const { ok, status } = await client.messages.delete(
         message.discord_channel_id,
         message.discord_message_id,
       );
+      if (!ok && status !== 404) return;
+
       deleteMessage(message.id);
       deleteMessageReactions(message.channel_id, message.discord_message_id);
     });
@@ -202,19 +204,21 @@ const sweepExpiredReactions = () => {
     }
 
     enqueueDeletion(pendingReactionIds, reaction.id, async () => {
-      await client.messages.removeReaction(
+      const { ok, status } = await client.messages.removeReaction(
         reaction.discord_channel_id,
         reaction.discord_message_id,
         reaction.emoji_name,
         reaction.emoji_id ?? undefined,
       );
+      if (!ok && status !== 404) return;
+
       deleteReaction(reaction.id);
     });
   }
 };
 
 export const startEphemeralMessaging = async () => {
-  const me = await client.me.get();
+  const { data: me } = await client.me.get();
   if (!me) {
     throw new Error("Authentication failed. Invalid token or Discord is down.");
   }
