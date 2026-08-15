@@ -1,7 +1,7 @@
 export type UTF16EncodedCharacter = string;
 
 export type Emoji = {
-  id: undefined;
+  id: string | null;
   name: UTF16EncodedCharacter;
 };
 

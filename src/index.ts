@@ -170,7 +170,7 @@ const getPage = async (
         msg.channel_id,
         msg.id,
         reaction.emoji.name,
-        reaction.emoji?.id,
+        reaction.emoji?.id ?? undefined,
       );
       await sleep(1200);
       pageReactionsRemoved++;

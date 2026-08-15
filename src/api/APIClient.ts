@@ -31,12 +31,21 @@ export default class APIClient extends HTTPClient {
   };
 
   messages = {
-    list: (channel: string, before?: string, limit: number = 50) => {
+    list: (
+      channel: string,
+      before?: string,
+      limit: number = 50,
+      after?: string,
+    ) => {
       const path = `v9/channels/${channel}/messages`;
       const params = new URLSearchParams({ limit: limit.toString() });
 
       if (before) {
         params.append("before", before);
+      }
+
+      if (after) {
+        params.append("after", after);
       }
 
       const fullPath = `${path}?${params.toString()}`;
