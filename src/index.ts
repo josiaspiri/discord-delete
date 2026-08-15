@@ -5,8 +5,9 @@ import { sleep } from "bun";
 import logUpdate from "log-update";
 import { join } from "path";
 import { CWD } from "./utility";
+import { defaults } from "./defaults";
 
-dotenv.config({ path: join(CWD, ".env") });
+dotenv.config({ path: join(CWD, ".env"), quiet: true });
 
 type State = {
   channels: string[];
@@ -79,7 +80,7 @@ const populateChannels = async (): Promise<void> => {
     console.log(
       `Got ${guildChannels?.length ?? 0} channels from ${guild.name}.`,
     );
-    await sleep(1200);
+    await sleep(defaults.rateLimitDelayMs);
     if (!guildChannels) continue;
 
     for (const ch of guildChannels) {
@@ -124,7 +125,7 @@ const getPage = async (
   meId: string,
   lastId: string | undefined,
 ): Promise<Page> => {
-  const PAGE_SIZE = 100;
+  const PAGE_SIZE = defaults.pageSize;
 
   const messages = await client.messages.list(channel.id, lastId, PAGE_SIZE);
   if (!messages || messages.length === 0) {
@@ -156,7 +157,7 @@ const getPage = async (
 
   for (const msg of myMessages) {
     await client.messages.delete(msg.channel_id, msg.id);
-    await sleep(1200);
+    await sleep(defaults.rateLimitDelayMs);
     pageDeleted++;
   }
 
@@ -172,7 +173,7 @@ const getPage = async (
         reaction.emoji.name,
         reaction.emoji?.id ?? undefined,
       );
-      await sleep(1200);
+      await sleep(defaults.rateLimitDelayMs);
       pageReactionsRemoved++;
     }
   }
