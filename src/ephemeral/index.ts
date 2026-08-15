@@ -210,10 +210,7 @@ const sweepExpiredReactions = () => {
       reaction.discord_channel_id,
       reaction.discord_message_id,
     );
-    if (pendingDeleteMessageKeys.has(key)) {
-      deleteReaction(reaction.id);
-      continue;
-    }
+    if (pendingDeleteMessageKeys.has(key)) continue;
 
     enqueueDeletion(pendingReactionIds, reaction.id, async () => {
       const { ok, status } = await client.messages.removeReaction(
