@@ -9,6 +9,10 @@
   },
   "private": true,
   "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "ephemeral": "bun run src/ephemeral/index.ts"
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "log-update": "^7.2.0"
