@@ -1,8 +1,21 @@
 import { constants, createInflate } from "zlib";
 import { gatewayEmitter } from "./emitter";
-import { GatewayEvent, GatewayOpCode } from "../types/gateway";
+import {
+  GatewayCloseCode,
+  GatewayEvent,
+  GatewayOpCode,
+} from "../types/gateway";
 
-export const emitter = gatewayEmitter;
+export { gatewayEmitter };
+
+const FATAL_CLOSE_CODES = new Set<number>([
+  GatewayCloseCode.AUTHENTICATION_FAILED,
+  GatewayCloseCode.INVALID_SHARD,
+  GatewayCloseCode.SHARDING_REQUIRED,
+  GatewayCloseCode.INVALID_API_VERSION,
+  GatewayCloseCode.INVALID_INTENTS,
+  GatewayCloseCode.DISALLOWED_INTENTS,
+]);
 
 const connect = () => {
   const socket = new WebSocket(
@@ -29,52 +42,54 @@ const connect = () => {
 
     inflater.on("data", (chunk) => {
       const rawData = chunk.toString("utf-8");
+      const payload = JSON.parse(rawData);
 
-      try {
-        const payload = JSON.parse(rawData);
-        console.log(payload);
-        if (payload.s && payload.op === GatewayOpCode.DISPATCH) {
-          sequence = payload.s;
+      if (payload.s && payload.op === GatewayOpCode.DISPATCH) {
+        sequence = payload.s;
+      }
+
+      if (
+        payload.op === GatewayOpCode.HELLO
+      ) {
+        heartbeatIntervalMs = payload.d.heartbeat_interval;
+
+        if (!heartbeatIntervalMs || heartbeatIntervalMs === 0) {
+          throw Error("Invalid hearbeat interval. Did the API change?");
         }
+        sendHeartbeat(sequence);
+      }
 
-        if (
-          payload.op === GatewayOpCode.HELLO
-        ) {
-          heartbeatIntervalMs = payload.d.heartbeat_interval;
-
-          if (!heartbeatIntervalMs || heartbeatIntervalMs === 0) {
-            throw Error("Invalid hearbeat interval. Did the API change?");
-          }
+      if (payload.op === GatewayOpCode.HEARTBEAT_ACK) {
+        heartbeatInterval && clearTimeout(heartbeatInterval);
+        heartbeatInterval = setTimeout(() => {
           sendHeartbeat(sequence);
-        }
+        }, heartbeatIntervalMs);
+      }
 
-        if (payload.op === GatewayOpCode.HEARTBEAT_ACK) {
-          heartbeatInterval && clearTimeout(heartbeatInterval);
-          heartbeatInterval = setTimeout(() => {
-            sendHeartbeat(sequence);
-          }, heartbeatIntervalMs);
-        }
+      if (payload.op === GatewayOpCode.HEARTBEAT) {
+        sendHeartbeat(sequence);
+      }
 
-        if (payload.op === GatewayOpCode.HEARTBEAT) {
-          sendHeartbeat(sequence);
-        }
+      if (payload.op === GatewayOpCode.RECONNECT) {
+        heartbeatInterval && clearTimeout(heartbeatInterval);
+        socket.close();
+      }
 
-        if (payload.op === GatewayOpCode.RECONNECT) {
-          heartbeatInterval && clearTimeout(heartbeatInterval);
-          socket.close();
-        }
+      if (payload.t === GatewayEvent.addReaction) {
+        gatewayEmitter.emit("gateway:addReaction", payload);
+      }
 
-        if (payload.t === GatewayEvent.addReaction) {
-          gatewayEmitter.emit("gateway:addReaction", payload);
-        }
-
-        if (payload.t === GatewayEvent.createMessage) {
-          gatewayEmitter.emit("gateway:createMessage", payload);
-        }
-      } catch (e) {}
+      if (payload.t === GatewayEvent.createMessage) {
+        gatewayEmitter.emit("gateway:createMessage", payload);
+      }
     });
 
-    socket.onclose = () => connect();
+    socket.onclose = (event) => {
+      if (FATAL_CLOSE_CODES.has(event.code)) {
+        throw new Error("Gateway closed with fatal code.",);
+      }
+      connect();
+    };
 
     socket.onmessage = (event) => {
       const { data } = event;
