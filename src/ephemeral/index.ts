@@ -220,8 +220,6 @@ export const startEphemeralMessaging = async () => {
   }
   meId = me.id;
 
-  await backfillTrackedChannels();
-
   gatewayEmitter.on("gateway:createMessage", (payload) => {
     const message = payload.d;
     if (message.author.id !== meId) return;
@@ -241,6 +239,8 @@ export const startEphemeralMessaging = async () => {
     );
     trackReaction(channelDbId, reaction);
   });
+
+  await backfillTrackedChannels();
 
   const sweep = () => {
     sweepExpiredMessages();
