@@ -18,7 +18,10 @@ const listTrackedChannelsStmt = db.query<TrackedChannel, []>(`
 export const listTrackedChannels = (): TrackedChannel[] =>
   listTrackedChannelsStmt.all();
 
-const insertChannelStmt = db.query<{ id: number }, [string, string, string]>(`
+const insertChannelStmt = db.query<
+  { id: number },
+  [string, string, string | null]
+>(`
   INSERT INTO channel (discord_channel_id, name, last_discord_message_id)
   VALUES (?, ?, ?)
   RETURNING id;
@@ -27,7 +30,7 @@ const insertChannelStmt = db.query<{ id: number }, [string, string, string]>(`
 export const insertChannel = (
   discordChannelId: string,
   name: string,
-  lastDiscordMessageId: string,
+  lastDiscordMessageId: string | null,
 ): number => {
   const row = insertChannelStmt.get(
     discordChannelId,

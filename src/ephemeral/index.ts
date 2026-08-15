@@ -70,7 +70,7 @@ let meId: string;
 
 const resolveChannelDbId = (
   discordChannelId: string,
-  seedDiscordMessageId: string,
+  seedDiscordMessageId: string | null,
 ): number => {
   const tracked = getChannel(discordChannelId);
   if (!tracked) {
@@ -237,10 +237,7 @@ export const startEphemeralMessaging = async () => {
     const reaction = payload.d;
     if (reaction.user_id !== meId) return;
 
-    const channelDbId = resolveChannelDbId(
-      reaction.channel_id,
-      reaction.message_id,
-    );
+    const channelDbId = resolveChannelDbId(reaction.channel_id, null);
     trackReaction(channelDbId, reaction);
   });
 
