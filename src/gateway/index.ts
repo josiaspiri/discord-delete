@@ -36,7 +36,7 @@ const connect = () => {
         op: GatewayOpCode.QOS_HEARTBEAT,
         d: {
           seq: sequence,
-          qos: { "active": false, "ver": 29, "reasons": [] },
+          qos: { active: false, ver: 29, reasons: [] },
         },
       }));
     };
@@ -50,9 +50,7 @@ const connect = () => {
         sequence = payload.s;
       }
 
-      if (
-        payload.op === GatewayOpCode.HELLO
-      ) {
+      if (payload.op === GatewayOpCode.HELLO) {
         heartbeatIntervalMs = payload.d.heartbeat_interval;
 
         if (!heartbeatIntervalMs || heartbeatIntervalMs === 0) {
@@ -88,7 +86,7 @@ const connect = () => {
 
     socket.onclose = (event) => {
       if (FATAL_CLOSE_CODES.has(event.code)) {
-        throw new Error("Gateway closed with fatal code.",);
+        throw new Error("Gateway closed with fatal code.");
       }
       connect();
     };
@@ -110,12 +108,12 @@ const connect = () => {
     };
 
     socket.send(JSON.stringify({
-      "op": GatewayOpCode.IDENTIFY,
-      "d": {
-        "token": process.env.DISCORD_DELETE_AUTHORIZATION,
-        "properties": {},
-        "client_state": {
-          "guild_versions": {},
+      op: GatewayOpCode.IDENTIFY,
+      d: {
+        token: process.env.DISCORD_DELETE_AUTHORIZATION,
+        properties: {},
+        client_state: {
+          guild_versions: {},
         },
       },
     }));
