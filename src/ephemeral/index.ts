@@ -118,6 +118,18 @@ const catchUpChannel = async (
     const chronological = [...page].reverse();
     for (const message of chronological) {
       trackMessage(channelDbId, message);
+
+      for (const reaction of message.reactions ?? []) {
+        if (!reaction.me) continue;
+        insertReaction(
+          channelDbId,
+          message.id,
+          reaction.emoji.name,
+          reaction.emoji.id,
+          Date.now(),
+        );
+      }
+
       after = message.id;
     }
 
