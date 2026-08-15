@@ -29,6 +29,7 @@ const connect = () => {
     let heartbeatInterval: Timer | null = null;
     let buffer = Buffer.alloc(0);
     let sequence: number | null = null;
+    let chunks: Buffer[] = [];
 
     const sendHeartbeat = (sequence: number | null): void => {
       socket.send(JSON.stringify({
@@ -41,9 +42,10 @@ const connect = () => {
     };
 
     inflater.on("data", (chunk) => {
-      const rawData = chunk.toString("utf-8");
-      const payload = JSON.parse(rawData);
+      chunks.push(chunk);
+    });
 
+    const handlePayload = (payload: any) => {
       if (payload.s && payload.op === GatewayOpCode.DISPATCH) {
         sequence = payload.s;
       }
@@ -82,7 +84,7 @@ const connect = () => {
       if (payload.t === GatewayEvent.createMessage) {
         gatewayEmitter.emit("gateway:createMessage", payload);
       }
-    });
+    };
 
     socket.onclose = (event) => {
       if (FATAL_CLOSE_CODES.has(event.code)) {
@@ -98,7 +100,11 @@ const connect = () => {
       if (!buffer.subarray(-4).equals(flush)) return;
 
       inflater.write(buffer);
-      inflater.flush(constants.Z_SYNC_FLUSH);
+      inflater.flush(constants.Z_SYNC_FLUSH, () => {
+        const rawData = Buffer.concat(chunks).toString("utf-8");
+        chunks = [];
+        handlePayload(JSON.parse(rawData));
+      });
 
       buffer = Buffer.alloc(0);
     };
