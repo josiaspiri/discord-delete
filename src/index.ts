@@ -132,7 +132,7 @@ const getPage = async (
     lastId,
     PAGE_SIZE,
   );
-  if (!messages || messages.length === 0) {
+  if (!Array.isArray(messages) || messages.length === 0) {
     return {
       nextLastId: lastId,
       continuePaging: false,
